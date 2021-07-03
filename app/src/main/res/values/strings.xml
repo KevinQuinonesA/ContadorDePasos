@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Contador de Pasos</string>
+    <string name="action_debug">Debug View</string>
+    <string name="steps_tracked">Pasos Realizados: 0</string>
+    <string name="android_steps_tracked">Pasos Realizados Android: 0</string>
+</resources>
