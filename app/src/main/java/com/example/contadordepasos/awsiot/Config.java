@@ -8,13 +8,10 @@ public class Config {
     public static final String COGNITO_POOL_ID = "us-east-2:53ab0e7c-a9ec-4e0b-a446-373b2f51e5c9";
     public static final Regions MY_REGION = Regions.US_EAST_2;
 
-    String topic_subscribe = "thing_steps_subscribe/<pk>";
-    String topic_public = "thing_steps_public/<pk>";
+    public static String topic_step_sensor_publicar = "sensorstepcounterpublicar";
+    public static String topic_step_sensor_subscribe = "sensorstepcountersubscribir";
 
-    String topic_step_sensor_publicar = "sensor/stepcounter/publicar";
-    String topic_step_sensor_subscribe = "sensor/stepcounter/subscribir";
-
-    String topic_acelerometer_publicar = "sensor/acelerometer/publicar";
-    String topic_acelerometer_subscribe  = "sensor/acelerometer/subscribir";
+    public static String topic_acelerometer_publicar = "sensoracelerometerpublicar";
+    public static String topic_acelerometer_subscribe  = "sensoracelerometersubscribir";
 
 }

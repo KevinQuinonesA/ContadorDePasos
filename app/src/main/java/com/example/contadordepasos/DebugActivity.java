@@ -20,14 +20,24 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.example.contadordepasos.awsiot.AWS;
+import com.example.contadordepasos.awsiot.Config;
+import com.example.contadordepasos.models.DataSteps;
+import com.example.contadordepasos.models.SensorAcelerometer;
+import com.example.contadordepasos.models.SensorUse;
+import com.example.contadordepasos.utils.MapperUtils;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+
+import static com.example.contadordepasos.awsiot.Config.COGNITO_POOL_ID;
 
 
 public class DebugActivity extends AppCompatActivity implements SensorEventListener {
@@ -64,10 +74,10 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
     double noiseThreshold = 2d;
     private int windowSize = 10;
 
+    CognitoCachingCredentialsProvider credentialsProvider;
     private AnimationDrawable animacion;
     private ImageView loading;
-
-
+    AWS aws;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,11 +92,12 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
         animacion = (AnimationDrawable) loading.getBackground();
         animacion.start();
         animationSetup();
-
-
-
-
-
+        credentialsProvider = new CognitoCachingCredentialsProvider(
+                getApplicationContext(),
+                COGNITO_POOL_ID,
+                Config.MY_REGION
+        );
+        aws = new AWS(credentialsProvider);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensorCount = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
@@ -207,6 +218,13 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
 
                 if(forwardSlope < 0 && downwardSlope > 0 && dataPointList.get(i).getY() > stepThreshold && dataPointList.get(i).getY() < noiseThreshold){
                     mStepCounter+=1;
+                    SensorAcelerometer sensorUse = new SensorAcelerometer("acelerometer");
+                    sensorUse.setX(mRawAccelValues[0]);
+                    sensorUse.setY(mRawAccelValues[1]);
+                    sensorUse.setZ(mRawAccelValues[2]);
+                    DataSteps dataSteps = new DataSteps("correr","2021/07/02",mStepCounter,sensorUse);
+                    aws.publicar(MapperUtils.MapperObj2Json(dataSteps).toString(), Config.topic_acelerometer_publicar);
+
                 }
             }
         }

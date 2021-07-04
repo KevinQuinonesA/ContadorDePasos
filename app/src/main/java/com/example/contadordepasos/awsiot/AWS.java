@@ -15,14 +15,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import static com.amazonaws.mobile.auth.core.internal.util.ThreadUtils.runOnUiThread;
-import static com.example.contadordepasos.awsiot.AWSConnect.LOG_TAG;
 
 public class AWS {
 
     private static final String CUSTOMER_SPECIFIC_ENDPOINT = "a1lmh1knpirix7-ats.iot.us-east-2.amazonaws.com";
     private static final String COGNITO_POOL_ID = "us-east-2:53ab0e7c-a9ec-4e0b-a446-373b2f51e5c9";
     private static final Regions MY_REGION = Regions.US_EAST_2;
-
+    final String LOG_TAG = "AWS";
     AWSIotMqttManager mqttManager;
     String clientId;
     CognitoCachingCredentialsProvider credentialsProvider;
@@ -31,29 +30,24 @@ public class AWS {
     String tvLastMessage = "";
     String topic_subscribe = "thing_steps_subscribe/<pk>";
     String topic_public = "thing_steps_public/<pk>";
-    public AWS(Context context){
-        context = context;
+    public AWS(CognitoCachingCredentialsProvider credentialsProvider_){
+        credentialsProvider = credentialsProvider_;
         setup();
     }
     private void setup(){
         clientId = UUID.randomUUID().toString();
-        credentialsProvider = new CognitoCachingCredentialsProvider(
-                context,
-                COGNITO_POOL_ID,
-                MY_REGION
-        );
         mqttManager = new AWSIotMqttManager(clientId, CUSTOMER_SPECIFIC_ENDPOINT);
         new Thread(() -> runOnUiThread(() -> connect())).start();
     }
 
     public void connect(){
-        enabled = true;
         try {
             mqttManager.connect(credentialsProvider, (status, throwable) -> {
                 runOnUiThread(() -> {
                     if (status == AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Connecting) {
                         Log.i(LOG_TAG, "Connecting...");
                     } else if (status == AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Connected) {
+                        enabled = true;
                         Log.i(LOG_TAG, "Connected");
                     } else if (status == AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Reconnecting) {
                         Log.i(LOG_TAG, "Reconnecting");
@@ -73,6 +67,9 @@ public class AWS {
     }
 
     public void subscribe(){
+        if(!enabled){
+            return;
+        }
         final String topic = topic_subscribe;
         Log.d(LOG_TAG, "topic = " + topic);
         try {
@@ -89,10 +86,15 @@ public class AWS {
         }
     }
 
-    public void publicar(String message) {
-           final String topic = topic_public;
+    public void publicar(String message, String topic) {
+        System.out.println("publicar...");
+        if(!enabled){
+            System.out.println("no publicar...");
+            return;
+        }
            final String msg = message;
            try {
+               System.out.println("publicado");
                 mqttManager.publishString(msg, topic, AWSIotMqttQos.QOS0);
            } catch (Exception e) {
                 Log.e(LOG_TAG, "Publish error.", e);
@@ -100,6 +102,9 @@ public class AWS {
     }
 
     public void disconned(){
+        if(!enabled){
+            return;
+        }
            try {
                 mqttManager.disconnect();
            } catch (Exception e) {
