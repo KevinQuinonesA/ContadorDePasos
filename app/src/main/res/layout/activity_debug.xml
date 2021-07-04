@@ -16,42 +16,41 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:gravity="center"
-        android:text="Bienvenidos"
+        android:text="¿Que desea Hacer?"
         android:textColor="#900000"
-        android:layout_marginLeft="65dp"
+        android:layout_gravity="center"
         android:textSize="18pt" />
 
     <ImageView
         android:id="@+id/loading"
         android:layout_width="293dp"
         android:layout_height="278dp"
+        android:layout_margin="15dp"
         android:layout_below="@id/texto"
-        android:layout_marginLeft="20dp"
-
-        android:gravity="center" />
+        android:layout_gravity="center"/>
 
     <Button
         android:id="@+id/buttonHome"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="70dp"
-        android:layout_marginTop="50dp"
+        android:layout_gravity="center"
         android:onClick="onClickBtn"
+        android:layout_margin="15dp"
         android:textColor="#FFFFFF"
         android:padding="20dp"
         android:background="@drawable/btn"
-        android:text="INICIAR CONTADOR" />
+        android:text="Contar mis pasos" />
     <Button
         android:id="@+id/buttonRegister"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="70dp"
-        android:layout_marginTop="30dp"
-        android:onClick="onClickBtn"
+        android:layout_margin="15dp"
+        android:layout_gravity="center"
+        android:onClick="onClickBtn1"
         android:textColor="#FFFFFF"
         android:padding="20dp"
         android:background="@drawable/btn"
-        android:text="Registrarse"
+        android:text="Ir a Mis Datos"
 
         tools:ignore="InvalidId" />
 

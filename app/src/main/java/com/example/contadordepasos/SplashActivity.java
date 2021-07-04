@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.contadordepasos.MainActivity;
 import com.example.contadordepasos.R;
@@ -19,6 +20,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private AnimationDrawable animacion;
     private ImageView loading;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,9 +28,10 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         Objects.requireNonNull(getSupportActionBar()).hide();
         View decorView = getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
         decorView.setSystemUiVisibility(uiOptions);
         loading = findViewById(R.id.loading);
+        textView = findViewById(R.id.texto);
         loading.setBackgroundResource(R.drawable.cargando);
         animacion = (AnimationDrawable) loading.getBackground();
         animacion.start();
@@ -38,6 +41,7 @@ public class SplashActivity extends AppCompatActivity {
     private void animationSetup(){
         Animation transicion = AnimationUtils.loadAnimation(this, R.anim.mitransicion);
         loading.startAnimation(transicion);
+        textView.startAnimation(transicion);
         transicion.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
@@ -57,16 +61,10 @@ public class SplashActivity extends AppCompatActivity {
         animacion.stop();
     }
     private void redirectUI() {
-        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+        Intent intent = new Intent(SplashActivity.this, DebugActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
         overridePendingTransition(0, 0);
         finish();
     }
-    public void onClickBtn(View v)
-    {
-        Intent i = new Intent(this, MainActivity.class);
-        this.startActivity(i);
-    }
-
 }

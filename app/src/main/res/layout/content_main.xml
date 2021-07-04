@@ -4,15 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#d3ecf5"
+    android:background="@color/white"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
+        android:paddingTop="30dp"
         android:weightSum="2"
         tools:ignore="MissingConstraints">
 
@@ -32,9 +34,11 @@
             android:layout_height="400dp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:background="@drawable/circle_shape"
             android:max="500"
             android:progress="0"
-            android:progressDrawable="@drawable/circular" />
+            android:progressDrawable="@drawable/progress_custom" />
 
         <TextView
             android:id="@+id/maintv2"
@@ -45,7 +49,30 @@
             android:textAlignment="center"
             android:textAllCaps="false" />
 
+
     </LinearLayout>
+    <Button
+        android:id="@+id/start"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/orange_solid"
+        android:text="INICIAR ACTIVIDAD DEL DIA"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/linearLayout">
 
+    </Button>
 
+    <ImageView
+        android:visibility="invisible"
+        android:id="@+id/end"
+        android:src="@drawable/ic_baseline_outlined_flag_24"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </ImageView>
 </androidx.constraintlayout.widget.ConstraintLayout>

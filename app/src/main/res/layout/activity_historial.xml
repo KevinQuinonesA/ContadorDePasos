@@ -1,35 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".HistorialActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/date"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Fecha"
+            android:textAlignment="center"
+            android:textSize="20dp"
+            android:visibility="visible"
+            tools:ignore="MissingConstraints" />
 
-    <TextView
-        android:id="@+id/date"
-        android:layout_width="204dp"
-        android:layout_height="30dp"
-        android:text="Fecha"
-        android:textAlignment="center"
-        android:textSize="20dp"
-        android:visibility="visible"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="20dp"
-        tools:layout_editor_absoluteY="46dp" />
+        <Button
+            android:id="@+id/btngocalendar"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ver Calendario"
+            tools:ignore="MissingConstraints"
+            android:textColor="#FFFFFF"
 
-    <Button
-        android:id="@+id/btngocalendar"
-        android:layout_width="138dp"
-        android:layout_height="48dp"
-        android:text="Calendario"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="257dp"
-        tools:layout_editor_absoluteY="30dp"
-        android:textColor="#FFFFFF"
+            android:background="@drawable/btn"
+            />
+    </LinearLayout>
 
-        android:background="@drawable/btn"
-        />
 
     <LinearLayout
         android:layout_width="412dp"
@@ -39,4 +42,4 @@
         tools:layout_editor_absoluteY="78dp"
         tools:ignore="MissingConstraints"></LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

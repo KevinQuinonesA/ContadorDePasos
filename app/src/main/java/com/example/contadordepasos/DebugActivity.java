@@ -3,6 +3,7 @@ package com.example.contadordepasos;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -23,18 +24,22 @@ import android.widget.TextView;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.example.contadordepasos.awsiot.AWS;
 import com.example.contadordepasos.awsiot.Config;
+import com.example.contadordepasos.datainformation.PerfilInformation;
 import com.example.contadordepasos.models.DataSteps;
 import com.example.contadordepasos.models.SensorAcelerometer;
+import com.example.contadordepasos.models.SensorStepCounter;
 import com.example.contadordepasos.models.SensorUse;
 import com.example.contadordepasos.utils.MapperUtils;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import static com.example.contadordepasos.awsiot.Config.COGNITO_POOL_ID;
@@ -78,6 +83,7 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
     private AnimationDrawable animacion;
     private ImageView loading;
     AWS aws;
+    public static boolean start = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,8 +91,9 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
         setContentView(R.layout.activity_debug);
         Objects.requireNonNull(getSupportActionBar()).hide();
         View decorView = getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
         decorView.setSystemUiVisibility(uiOptions);
+        // mStepCounter = readPreferences();
         loading = findViewById(R.id.loading);
         loading.setBackgroundResource(R.drawable.cargando);
         animacion = (AnimationDrawable) loading.getBackground();
@@ -98,45 +105,36 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
                 Config.MY_REGION
         );
         aws = new AWS(credentialsProvider);
-
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensorCount = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         mSensorAcc = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(this, mSensorCount, SensorManager.SENSOR_DELAY_UI);
         mSensorManager.registerListener(this, mSensorAcc, SensorManager.SENSOR_DELAY_UI);
-
-
-        //Grafica para mostrar la señal de magnitud de aceleración sin procesar
-        //GraphView graph = (GraphView) this.findViewById(R.id.graph);
         mSeries1 = new LineGraphSeries<>();
-        /*graph.addSeries(mSeries1);
-        graph.setTitle("Accelerator Signal");
-        graph.getGridLabelRenderer().setVerticalAxisTitle("Signal Value");
-        graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setMinX(0);
-        graph.getViewport().setMaxX(60);*/
-
-        // Gráfico para mostrar la señal de magnitud de aceleración suavizada
-        //GraphView graph2 = (GraphView) this.findViewById(R.id.graph2);
         mSeries2 = new LineGraphSeries<>();
-        /*graph2.setTitle("Smoothed Signal");
-        graph2.addSeries(mSeries2);
-        graph2.getGridLabelRenderer().setVerticalAxisTitle("Signal Value");
-        graph2.getViewport().setXAxisBoundsManual(true);
-        graph2.getViewport().setMinX(0);
-        graph2.getViewport().setMaxX(60);*/
     }
 
     //Botón para enlazar el Home desde la vista de DEBUG
     public void onClickBtn(View v)
     {
+        System.out.println("SALTA");
         Intent i = new Intent(this, MainActivity.class);
         this.startActivity(i);
     }
-
+    //Botón para enlazar el Home desde la vista de Datos
+    public void onClickBtn1(View v)
+    {
+        System.out.println("SALTA");
+        Intent i = new Intent(DebugActivity.this, PerfilInformation.class);
+        System.out.println("SALTA");
+        startActivity(i);
+    }
     @Override
     public void onSensorChanged (SensorEvent e)
     {
+        if(!start){
+            return;
+        }
         switch (e.sensor.getType()) {
             case Sensor.TYPE_STEP_COUNTER:
                 if (mInitialStepCount == 0.0) {
@@ -218,13 +216,21 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
 
                 if(forwardSlope < 0 && downwardSlope > 0 && dataPointList.get(i).getY() > stepThreshold && dataPointList.get(i).getY() < noiseThreshold){
                     mStepCounter+=1;
-                    SensorAcelerometer sensorUse = new SensorAcelerometer("acelerometer");
-                    sensorUse.setX(mRawAccelValues[0]);
-                    sensorUse.setY(mRawAccelValues[1]);
-                    sensorUse.setZ(mRawAccelValues[2]);
-                    DataSteps dataSteps = new DataSteps("correr","2021/07/02",mStepCounter,sensorUse);
-                    aws.publicar(MapperUtils.MapperObj2Json(dataSteps).toString(), Config.topic_acelerometer_publicar);
-
+                    String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+                    if(mSensorCount!=null){
+                        SensorStepCounter sensorUse = new SensorStepCounter("stepcounter");
+                        sensorUse.setStepcount(mStepCounterAndroid);
+                        DataSteps dataSteps = new DataSteps("caminata",date,mStepCounter,sensorUse);
+                        aws.publicar(MapperUtils.MapperObj2Json(dataSteps).toString(), Config.topic_step_sensor_publicar);
+                    }else{
+                        SensorAcelerometer sensorUse = new SensorAcelerometer("acelerometer");
+                        sensorUse.setX(mRawAccelValues[0]);
+                        sensorUse.setY(mRawAccelValues[1]);
+                        sensorUse.setZ(mRawAccelValues[2]);
+                        DataSteps dataSteps = new DataSteps("caminata",date,mStepCounter,sensorUse);
+                        aws.publicar(MapperUtils.MapperObj2Json(dataSteps).toString(), Config.topic_acelerometer_publicar);
+                    }
+                    savePreferences(mStepCounter);
                 }
             }
         }
@@ -233,6 +239,7 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
+
 
     private void animationSetup(){
         Animation transicion = AnimationUtils.loadAnimation(this, R.anim.mitransicion);
@@ -261,5 +268,15 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
         startActivity(intent);
         overridePendingTransition(0, 0);
         finish();
+    }
+    private void savePreferences(float stepcounter){
+        SharedPreferences preferences = getSharedPreferences("StepDay",Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putFloat("stepcounter",stepcounter);
+        editor.commit();
+    }
+    private float readPreferences(){
+        SharedPreferences preferences = getSharedPreferences("StepDay",Context.MODE_PRIVATE);
+        return preferences.getFloat("stepcounter",0);
     }
 }
