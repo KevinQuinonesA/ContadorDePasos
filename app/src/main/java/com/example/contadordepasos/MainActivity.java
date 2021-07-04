@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
             if(stepCounter >= 500 && !showedGoalReach){
                 showedGoalReach = true;
                 Context context = getApplicationContext();
-                CharSequence text = "Buen trabajo! Alcanzaste tu meta!";
+                CharSequence text = "Buen trabajo! Alcanzaste la meta!";
                 int duration = Toast.LENGTH_LONG;
                 Toast toast = Toast.makeText(context, text, duration);
                 toast.show();
