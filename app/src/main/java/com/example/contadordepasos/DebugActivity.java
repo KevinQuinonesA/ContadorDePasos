@@ -3,6 +3,7 @@ package com.example.contadordepasos;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,6 +15,9 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
@@ -23,6 +27,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 
 public class DebugActivity extends AppCompatActivity implements SensorEventListener {
@@ -33,7 +38,7 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
     public static Sensor mSensorCount, mSensorAcc;
     private float mRawAccelValues[] = new float[3];
 
-    // suavizar las variables de la señal del acelerómetro
+    // smoothing accelerometer signal variables
     private float mAccelValueHistory[][] = new float[3][SMOOTHING_WINDOW_SIZE];
     private float mRunningAccelTotal[] = new float[3];
     private float mCurAccelAvg[] = new float[3];
@@ -53,16 +58,35 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
     private double avgMag = 0d;
     private double netMag = 0d;
 
-    //variables de detección de picos
+    //peak detection variables
     private double lastXPoint = 1d;
     double stepThreshold = 1.0d;
     double noiseThreshold = 2d;
     private int windowSize = 10;
 
+    private AnimationDrawable animacion;
+    private ImageView loading;
+
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_debug);
+        Objects.requireNonNull(getSupportActionBar()).hide();
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+        loading = findViewById(R.id.loading);
+        loading.setBackgroundResource(R.drawable.cargando);
+        animacion = (AnimationDrawable) loading.getBackground();
+        animacion.start();
+        animationSetup();
+
+
+
+
+
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensorCount = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
@@ -71,28 +95,28 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
         mSensorManager.registerListener(this, mSensorAcc, SensorManager.SENSOR_DELAY_UI);
 
 
-        //Grafica para mostrar la señal de magnitud de aceleración sin procesar
-        GraphView graph = (GraphView) this.findViewById(R.id.graph);
+        //Graph for showing raw acceleration magnitude signal
+       //GraphView graph = (GraphView) this.findViewById(R.id.graph);
         mSeries1 = new LineGraphSeries<>();
-        graph.addSeries(mSeries1);
+        /*graph.addSeries(mSeries1);
         graph.setTitle("Accelerator Signal");
         graph.getGridLabelRenderer().setVerticalAxisTitle("Signal Value");
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(0);
-        graph.getViewport().setMaxX(60);
+        graph.getViewport().setMaxX(60);*/
 
-        // Gráfico para mostrar la señal de magnitud de aceleración suavizada
-        GraphView graph2 = (GraphView) this.findViewById(R.id.graph2);
+        //Graph for showing smoothed acceleration magnitude signal
+        //GraphView graph2 = (GraphView) this.findViewById(R.id.graph2);
         mSeries2 = new LineGraphSeries<>();
-        graph2.setTitle("Señal suavizada");
+        /*graph2.setTitle("Smoothed Signal");
         graph2.addSeries(mSeries2);
-        graph2.getGridLabelRenderer().setVerticalAxisTitle("Valor de señal");
+        graph2.getGridLabelRenderer().setVerticalAxisTitle("Signal Value");
         graph2.getViewport().setXAxisBoundsManual(true);
         graph2.getViewport().setMinX(0);
-        graph2.getViewport().setMaxX(60);
+        graph2.getViewport().setMaxX(60);*/
     }
 
-    //Botón para enlazar el Home desde la vista de DEBUG
+    //Button to link home view from debug view
     public void onClickBtn(View v)
     {
         Intent i = new Intent(this, MainActivity.class);
@@ -109,7 +133,7 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
 
                 lastMag = Math.sqrt(Math.pow(mRawAccelValues[0], 2) + Math.pow(mRawAccelValues[1], 2) + Math.pow(mRawAccelValues[2], 2));
 
-                //Fuente: https://github.com/jonfroehlich/CSE590Sp2018
+                //Source: https://github.com/jonfroehlich/CSE590Sp2018
                 for (int i = 0; i < 3; i++) {
                     mRunningAccelTotal[i] = mRunningAccelTotal[i] - mAccelValueHistory[i][mCurReadIndex];
                     mAccelValueHistory[i][mCurReadIndex] = mRawAccelValues[i];
@@ -123,9 +147,9 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
 
                 avgMag = Math.sqrt(Math.pow(mCurAccelAvg[0], 2) + Math.pow(mCurAccelAvg[1], 2) + Math.pow(mCurAccelAvg[2], 2));
 
-                netMag = lastMag - avgMag; //remover efecto de la gravedad
+                netMag = lastMag - avgMag; //removes gravity effect
 
-                //actualizar puntos del grafico
+                //update graph data points
                 mGraph1LastXValue += 1d;
                 mSeries1.appendData(new DataPoint(mGraph1LastXValue, lastMag), true, 60);
 
@@ -133,24 +157,24 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
                 mSeries2.appendData(new DataPoint(mGraph2LastXValue, netMag), true, 60);
 
 
-        TextView calculatedStep = (TextView) this.findViewById(R.id.tv1);
-        TextView androidStep = (TextView) this.findViewById(R.id.tv2);
+        //TextView calculatedStep = (TextView) this.findViewById(R.id.tv1);
+        //TextView androidStep = (TextView) this.findViewById(R.id.tv2);
 
         peakDetection();
 
-        calculatedStep.setText(new String("Pasos contados: " + (int)mStepCounter));
-        //Android siempre devuelve el total de pasos desde el reinicio, así que restamos todos los pasos registrados antes de que comenzara la aplicación
-        androidStep.setText(new String("Pasos Contados Android: " + (int)(mStepCounterAndroid - mInitialStepCount)));
+        //calculatedStep.setText(new String("Steps Tracked: " + (int)mStepCounter));
+        //android always returns total steps since reboot so subtract all steps recorded before the app started
+        //androidStep.setText(new String("Android Steps Tracked: " + (int)(mStepCounterAndroid - mInitialStepCount)));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void peakDetection(){
 
-        /* Algoritmo de detección de picos derivado de: Un servicio de contador de pasos para dispositivos habilitados para Java que utilizan un acelerómetro incorporado, Mladenov et al.
-          * Threshold, stepThreshold se obtuvo observando el gráfico de pasos de las personas
-          * SUPUESTOS:
-          * El teléfono se sostiene verticalmente en orientación vertical para obtener mejores resultados
-          */
+        /* Peak detection algorithm derived from: A Step Counter Service for Java-Enabled Devices Using a Built-In Accelerometer, Mladenov et al.
+         *Threshold, stepThreshold was derived by observing people's step graph
+         * ASSUMPTIONS:
+         * Phone is held vertically in portrait orientation for better results
+         */
 
         double highestValX = mSeries2.getHighestValueX();
 
@@ -183,5 +207,34 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
+
+    private void animationSetup(){
+        Animation transicion = AnimationUtils.loadAnimation(this, R.anim.mitransicion);
+        loading.startAnimation(transicion);
+        transicion.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                stopAnimation();
+                //redirectUI();
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+    }
+    private void stopAnimation(){
+        animacion.stop();
+    }
+    private void redirectUI() {
+        Intent intent = new Intent(DebugActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
+        finish();
     }
 }

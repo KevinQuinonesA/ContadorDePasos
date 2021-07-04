@@ -41,15 +41,15 @@ public class MainActivity extends AppCompatActivity {
             if(stepCounter >= 500 && !showedGoalReach){
                 showedGoalReach = true;
                 Context context = getApplicationContext();
-                CharSequence text = "Buen trabajo! Alcanzaste tu meta!";
+                CharSequence text = "Good Job! You've reached your goal!";
                 int duration = Toast.LENGTH_LONG;
                 Toast toast = Toast.makeText(context, text, duration);
                 toast.show();
             }
             TextView stepCountStr = (TextView) this.findViewById(R.id.maintv1);
-            stepCountStr.setText(new String("Número de pasos: " + stepCounter));
+            stepCountStr.setText(new String("Step Count: " + stepCounter));
             TextView progressText = (TextView) this.findViewById(R.id.maintv2);
-            progressText.setText(new String("Objetivo de pasos: " + 500 + ". Progreso: " + stepCounter + " / 500"));
+            progressText.setText(new String("Step Goal: " + 500 + ". Progress: " + stepCounter + " / 500"));
 
             ProgressBar progressBar = (ProgressBar) this.findViewById(R.id.progressBar);
             ObjectAnimator animation = ObjectAnimator.ofInt(progressBar, "progress", lastStep, stepCounter); //animate only from last known step to current step count
@@ -69,9 +69,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Manejar los clics de elementos de la barra de acciones aquí
-        // La barra de acción manejará automáticamente los clics en el botón Inicio / Arriba, siempre que
-        // especifique una actividad principal en AndroidManifest.xml.
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         final Context context = this;
 
