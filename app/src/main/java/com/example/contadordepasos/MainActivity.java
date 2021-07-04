@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
             if(stepCounter >= 500 && !showedGoalReach){
                 showedGoalReach = true;
                 Context context = getApplicationContext();
-                CharSequence text = "Good Job! You've reached your goal!";
+                CharSequence text = "Buen trabajo! Alcanzaste la meta!";
                 int duration = Toast.LENGTH_LONG;
                 Toast toast = Toast.makeText(context, text, duration);
                 toast.show();
@@ -52,8 +52,8 @@ public class MainActivity extends AppCompatActivity {
             progressText.setText(new String("Step Goal: " + 500 + ". Progress: " + stepCounter + " / 500"));
 
             ProgressBar progressBar = (ProgressBar) this.findViewById(R.id.progressBar);
-            ObjectAnimator animation = ObjectAnimator.ofInt(progressBar, "progress", lastStep, stepCounter); //animate only from last known step to current step count
-            animation.setDuration(5000); // in milliseconds
+            ObjectAnimator animation = ObjectAnimator.ofInt(progressBar, "progress", lastStep, stepCounter); //animar solo desde elm ultimo paso al paso actual
+            animation.setDuration(5000); // en milisegundos
             animation.setInterpolator(new DecelerateInterpolator());
             animation.start();
             lastStep = stepCounter;
@@ -62,17 +62,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        // Inflar el menú; esto agrega elementos a la barra de acción si está presente.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        // Manejar los clics de elementos de la barra de acciones aquí
+        // La barra de acción manejará automáticamente los clics en el botón Inicio / Arriba, siempre que
+        // especifique una actividad principal en AndroidManifest.xml.
         final Context context = this;
 
         //noinspection SimplifiableIfStatement
