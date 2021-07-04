@@ -132,6 +132,7 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
                 mGraph2LastXValue += 1d;
                 mSeries2.appendData(new DataPoint(mGraph2LastXValue, netMag), true, 60);
 
+
         TextView calculatedStep = (TextView) this.findViewById(R.id.tv1);
         TextView androidStep = (TextView) this.findViewById(R.id.tv2);
 
