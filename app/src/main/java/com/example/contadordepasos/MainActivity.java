@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
             ProgressBar progressBar = (ProgressBar) this.findViewById(R.id.progressBar);
             ObjectAnimator animation = ObjectAnimator.ofInt(progressBar, "progress", lastStep, stepCounter); //animate only from last known step to current step count
-            animation.setDuration(5000); // in milliseconds
+            animation.setDuration(5000); // en milisegundos
             animation.setInterpolator(new DecelerateInterpolator());
             animation.start();
             lastStep = stepCounter;
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        // Inflar el menú; esto agrega elementos a la barra de acción si está presente.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }

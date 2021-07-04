@@ -102,14 +102,7 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
     @Override
     public void onSensorChanged (SensorEvent e)
     {
-        switch (e.sensor.getType()) {
-            case Sensor.TYPE_STEP_COUNTER:
-                if(mInitialStepCount == 0.0){
-                    mInitialStepCount = e.values[0];
-                }
-                mStepCounterAndroid = e.values[0];
-                break;
-            case Sensor.TYPE_ACCELEROMETER:
+
                 mRawAccelValues[0] = e.values[0];
                 mRawAccelValues[1] = e.values[1];
                 mRawAccelValues[2] = e.values[2];
@@ -138,7 +131,6 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
 
                 mGraph2LastXValue += 1d;
                 mSeries2.appendData(new DataPoint(mGraph2LastXValue, netMag), true, 60);
-        }
 
         TextView calculatedStep = (TextView) this.findViewById(R.id.tv1);
         TextView androidStep = (TextView) this.findViewById(R.id.tv2);
