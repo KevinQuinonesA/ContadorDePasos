@@ -82,6 +82,14 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
+        else {
+            if (id == R.id.historial_debug) {
+                Intent intent = new Intent(context, HistorialActivity.class);
+                startActivity(intent);
+                return true;
+            }
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

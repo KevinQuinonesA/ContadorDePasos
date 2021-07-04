@@ -7,4 +7,9 @@
         android:orderInCategory="100"
         android:title="@string/action_debug"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/historial_debug"
+        android:orderInCategory="200"
+        android:title="Historial de Actividades"
+        app:showAsAction="never" />
 </menu>
