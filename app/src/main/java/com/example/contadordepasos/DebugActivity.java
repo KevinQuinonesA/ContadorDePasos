@@ -48,7 +48,7 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
     public static Sensor mSensorCount, mSensorAcc;
     private float mRawAccelValues[] = new float[3];
 
-    // smoothing accelerometer signal variables
+    // suavizar las variables de la señal del acelerómetro
     private float mAccelValueHistory[][] = new float[3][SMOOTHING_WINDOW_SIZE];
     private float mRunningAccelTotal[] = new float[3];
     private float mCurAccelAvg[] = new float[3];
@@ -68,7 +68,7 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
     private double avgMag = 0d;
     private double netMag = 0d;
 
-    //peak detection variables
+    //variables de detección de picos
     private double lastXPoint = 1d;
     double stepThreshold = 1.0d;
     double noiseThreshold = 2d;
@@ -106,8 +106,8 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
         mSensorManager.registerListener(this, mSensorAcc, SensorManager.SENSOR_DELAY_UI);
 
 
-        //Graph for showing raw acceleration magnitude signal
-       //GraphView graph = (GraphView) this.findViewById(R.id.graph);
+        //Grafica para mostrar la señal de magnitud de aceleración sin procesar
+        //GraphView graph = (GraphView) this.findViewById(R.id.graph);
         mSeries1 = new LineGraphSeries<>();
         /*graph.addSeries(mSeries1);
         graph.setTitle("Accelerator Signal");
@@ -116,7 +116,7 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
         graph.getViewport().setMinX(0);
         graph.getViewport().setMaxX(60);*/
 
-        //Graph for showing smoothed acceleration magnitude signal
+        // Gráfico para mostrar la señal de magnitud de aceleración suavizada
         //GraphView graph2 = (GraphView) this.findViewById(R.id.graph2);
         mSeries2 = new LineGraphSeries<>();
         /*graph2.setTitle("Smoothed Signal");
@@ -127,7 +127,7 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
         graph2.getViewport().setMaxX(60);*/
     }
 
-    //Button to link home view from debug view
+    //Botón para enlazar el Home desde la vista de DEBUG
     public void onClickBtn(View v)
     {
         Intent i = new Intent(this, MainActivity.class);
@@ -139,7 +139,7 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
     {
         switch (e.sensor.getType()) {
             case Sensor.TYPE_STEP_COUNTER:
-                if(mInitialStepCount == 0.0){
+                if (mInitialStepCount == 0.0) {
                     mInitialStepCount = e.values[0];
                 }
                 mStepCounterAndroid = e.values[0];
@@ -159,7 +159,7 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
                     mCurAccelAvg[i] = mRunningAccelTotal[i] / SMOOTHING_WINDOW_SIZE;
                 }
                 mCurReadIndex++;
-                if(mCurReadIndex >= SMOOTHING_WINDOW_SIZE){
+                if (mCurReadIndex >= SMOOTHING_WINDOW_SIZE) {
                     mCurReadIndex = 0;
                 }
 
@@ -167,7 +167,7 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
 
                 netMag = lastMag - avgMag; //removes gravity effect
 
-                //update graph data points
+                //actualizar puntos del grafico
                 mGraph1LastXValue += 1d;
                 mSeries1.appendData(new DataPoint(mGraph1LastXValue, lastMag), true, 60);
 
@@ -180,18 +180,18 @@ public class DebugActivity extends AppCompatActivity implements SensorEventListe
 
         peakDetection();
 
-        //calculatedStep.setText(new String("Steps Tracked: " + (int)mStepCounter));
-        //android always returns total steps since reboot so subtract all steps recorded before the app started
-        //androidStep.setText(new String("Android Steps Tracked: " + (int)(mStepCounterAndroid - mInitialStepCount)));
+        //calculatedStep.setText(new String("Pasos contados: " + (int)mStepCounter));
+        //Android siempre devuelve el total de pasos desde el reinicio, así que restamos todos los pasos registrados antes de que comenzara la aplicación
+        //androidStep.setText(new String("Pasos Contados Android: " + (int)(mStepCounterAndroid - mInitialStepCount)));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void peakDetection(){
 
-        /* Peak detection algorithm derived from: A Step Counter Service for Java-Enabled Devices Using a Built-In Accelerometer, Mladenov et al.
-         *Threshold, stepThreshold was derived by observing people's step graph
-         * ASSUMPTIONS:
-         * Phone is held vertically in portrait orientation for better results
+        /* Algoritmo de detección de picos derivado de: Un servicio de contador de pasos para dispositivos habilitados para Java que utilizan un acelerómetro incorporado, Mladenov et al.
+         * Threshold, stepThreshold se obtuvo observando el gráfico de pasos de las personas
+         * SUPUESTOS:
+         * El teléfono se sostiene verticalmente en orientación vertical para obtener mejores resultados
          */
 
         double highestValX = mSeries2.getHighestValueX();
